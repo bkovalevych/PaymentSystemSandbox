@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PaymentSystemSandbox.Data.Migrations
 {
-    public partial class AddPaymentTransactionTable : Migration
+    public partial class AddedPaymentTransactionTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

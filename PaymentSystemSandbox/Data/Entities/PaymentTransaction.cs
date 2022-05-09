@@ -1,4 +1,5 @@
-﻿using System.Transactions;
+﻿
+using PaymentSystemSandbox.Data.Enums;
 
 namespace PaymentSystemSandbox.Data.Entities
 {
@@ -10,7 +11,7 @@ namespace PaymentSystemSandbox.Data.Entities
 
         public DateTimeOffset ProcessedAt { get; set; }
         
-        public TransactionStatus Status { get; set; } 
+        public PaymentTransactionStatus Status { get; set; } 
 
         public int FromWalletId { get; set; }
 
@@ -21,5 +22,9 @@ namespace PaymentSystemSandbox.Data.Entities
         public Wallet ToWallet { get; set; }
 
         public decimal Price { get; set; }
+
+        public decimal TaxInPercent { get; set; }
+
+        public decimal PriceWithTax { get; set; } 
     }
 }

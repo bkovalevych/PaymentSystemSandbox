@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PaymentSystemSandbox.Data;
 
@@ -11,9 +12,10 @@ using PaymentSystemSandbox.Data;
 namespace PaymentSystemSandbox.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220509141644_AddedPaymentTransactionTable")]
+    partial class AddedPaymentTransactionTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -241,18 +243,12 @@ namespace PaymentSystemSandbox.Data.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(12,2)");
 
-                    b.Property<decimal>("PriceWithTax")
-                        .HasColumnType("decimal(12,2)");
-
                     b.Property<DateTimeOffset>("ProcessedAt")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("TaxInPercent")
-                        .HasColumnType("decimal(5,2)");
 
                     b.Property<int>("ToWalletId")
                         .HasColumnType("int");

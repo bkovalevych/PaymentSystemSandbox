@@ -11,16 +11,19 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PaymentSystemSandbox.Data;
 using PaymentSystemSandbox.Data.Entities;
+using PaymentSystemSandbox.Services.Interfaces;
 
 namespace PaymentSystemSandbox.Pages
 {
     public class SendMoneyModel : PageModel
     {
-        private readonly PaymentSystemSandbox.Data.ApplicationDbContext _context;
-        public Wallet Wallet { get; set; }
-        public SendMoneyModel(PaymentSystemSandbox.Data.ApplicationDbContext context)
+        private readonly ApplicationDbContext _context;
+        private readonly IWalletService _walletService;
+
+        public SendMoneyModel(ApplicationDbContext context, IWalletService walletService)
         {
             _context = context;
+            _walletService = walletService;
         }
 
         public IActionResult OnGet()
@@ -31,34 +34,28 @@ namespace PaymentSystemSandbox.Pages
                 return NotFound();
             }
             
-            Wallet = _context.Wallets.FirstOrDefault(it => it.UserId == userId);
-            ViewData["WalletId"] = Wallet.Id;
+            var wallet = _context.Wallets.FirstOrDefault(it => it.UserId == userId);
+            if (wallet == null)
+            {
+                wallet = _walletService.InitiateWalletForUser(userId);
+            }
+            ViewData["WalletId"] = wallet.Id;
             PaymentTransaction = new PaymentTransaction()
             {
-                FromWalletId = Wallet.Id,
+                FromWalletId = wallet.Id,
                 Price = 12M
             };
-            if (Wallet == null)
-            {
-                Wallet = new Wallet()
-                {
-                    Balance = 1000,
-                    UserId = userId
-                };
-                _context.Add(Wallet);
-                _context.SaveChanges();
-            }
-            ViewData["MaxPrice"] = Wallet.Balance;
+            ViewData["MaxPrice"] = wallet.Balance;
             ViewData["ToWalletId"] = new SelectList(_context.Wallets
                 .Include(it => it.User)
                 .Where(it => it.UserId != userId), "Id", "User.Email");
+            
             return Page();
         }
 
         [BindProperty]
         public PaymentTransaction PaymentTransaction { get; set; }
 
-        // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
             if (
@@ -68,12 +65,8 @@ namespace PaymentSystemSandbox.Pages
             {
                 return Page();
             }
-            _context.PaymentTransactions.Add(PaymentTransaction);
+            await _walletService.SendTransactionAsync(PaymentTransaction);
             
-            await _context.SaveChangesAsync();
-            
-            
-
             return RedirectToPage("./Index");
         }
     }

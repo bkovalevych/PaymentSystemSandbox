@@ -12,8 +12,8 @@ using PaymentSystemSandbox.Data;
 namespace PaymentSystemSandbox.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220509102024_AddPaymentTransactionTable")]
-    partial class AddPaymentTransactionTable
+    [Migration("20220509143224_AddedTaxFieldForPaymentTransactionTable")]
+    partial class AddedTaxFieldForPaymentTransactionTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -243,12 +243,18 @@ namespace PaymentSystemSandbox.Data.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(12,2)");
 
+                    b.Property<decimal>("PriceWithTax")
+                        .HasColumnType("decimal(12,2)");
+
                     b.Property<DateTimeOffset>("ProcessedAt")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TaxInPercent")
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<int>("ToWalletId")
                         .HasColumnType("int");

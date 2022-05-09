@@ -27,6 +27,14 @@ namespace PaymentSystemSandbox.Data.Configurations
             builder.Property(transaction => transaction.Price)
                 .IsRequired()
                 .HasColumnType($"decimal(12, 2)");
+
+            builder.Property(transaction => transaction.TaxInPercent)
+                .IsRequired()
+                .HasColumnType($"decimal(5, 2)");
+
+            builder.Property(transaction => transaction.PriceWithTax)
+                .IsRequired()
+                .HasColumnType($"decimal(12, 2)");
         }
     }
 }

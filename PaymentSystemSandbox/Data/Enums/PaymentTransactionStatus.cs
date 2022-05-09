@@ -1,6 +1,6 @@
 ﻿namespace PaymentSystemSandbox.Data.Enums
 {
-    public enum TransactionStatus
+    public enum PaymentTransactionStatus
     {
         Pending,
         Confirmed,
