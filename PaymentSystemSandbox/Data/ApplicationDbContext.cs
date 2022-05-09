@@ -6,12 +6,14 @@ namespace PaymentSystemSandbox.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {
-        public DbSet<Wallet> Wallets { get; set; }
-        
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
+
+        public DbSet<Wallet> Wallets { get; set; }
+
+        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
