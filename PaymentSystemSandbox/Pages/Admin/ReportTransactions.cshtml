@@ -1,0 +1,78 @@
+﻿@page
+@model PaymentSystemSandbox.Pages.Admin.ReportTransactionsModel
+
+@{
+    ViewData["Title"] = "ReportTransactions";
+}
+
+<h1>ReportTransactions</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentTransaction[0].IssuatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentTransaction[0].ProcessedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentTransaction[0].Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentTransaction[0].FromWallet)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentTransaction[0].ToWallet)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentTransaction[0].Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentTransaction[0].TaxInPercent)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentTransaction[0].PriceWithTax)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.PaymentTransaction) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.IssuatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProcessedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FromWallet.UserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ToWallet.UserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TaxInPercent)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PriceWithTax)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

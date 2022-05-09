@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using PaymentSystemSandbox.Data;
 using PaymentSystemSandbox.Data.Entities;
 using PaymentSystemSandbox.Data.Enums;
@@ -19,6 +20,8 @@ namespace PaymentSystemSandbox.Services
             _context = context;
             _walletSettings = walletSettings.Value;
         }
+
+        public decimal CurrentTaxInPercent => _walletSettings.CommissionInPercent;
 
         public Wallet InitiateWalletForUser(string userId)
         {
@@ -44,9 +47,9 @@ namespace PaymentSystemSandbox.Services
             return wallet;
         }
 
-        public decimal PaymentWithTax(decimal amount)
+        public decimal PaymentTax(decimal amount)
         {
-            var result = amount * (1 + _walletSettings.CommissionInPercent / 100m);
+            var result = amount * _walletSettings.CommissionInPercent / 100m;
             return result;
         }
 
@@ -56,6 +59,7 @@ namespace PaymentSystemSandbox.Services
             _context.Entry(paymentTransaction).Reference(it => it.FromWallet).Load();
             paymentTransaction.Status = PaymentTransactionStatus.Pending;
             paymentTransaction.IssuatedAt = DateTimeOffset.Now;
+            
             if (paymentTransaction.FromWallet.Balance < paymentTransaction.Price)
             {
 
@@ -63,9 +67,34 @@ namespace PaymentSystemSandbox.Services
             
         }
 
-        public Task SendTransactionAsync(PaymentTransaction paymentTransaction)
+        public async Task SendTransactionAsync(PaymentTransaction paymentTransaction)
         {
-            throw new NotImplementedException();
+            await _context.Database.BeginTransactionAsync();
+            var wallet = await _context.Wallets.FirstOrDefaultAsync(it => it.Id == paymentTransaction.FromWalletId);
+
+            paymentTransaction.Status = PaymentTransactionStatus.Confirmed;
+            paymentTransaction.IssuatedAt = DateTimeOffset.Now;
+            paymentTransaction.TaxInPercent = _walletSettings.CommissionInPercent;
+            paymentTransaction.PriceWithTax = paymentTransaction.Price + PaymentTax(paymentTransaction.Price);
+            
+            if (wallet.Balance < paymentTransaction.PriceWithTax)
+            {
+                return;
+            }
+            wallet.Balance -= paymentTransaction.PriceWithTax;
+            
+            try
+            {
+                _context.Add(paymentTransaction);
+                _context.Wallets.Update(wallet);
+                _context.SaveChanges();
+            } 
+            catch (Exception ex)
+            {
+                await _context.Database.RollbackTransactionAsync();
+            }
+            
+            await _context.Database.CommitTransactionAsync();
         }
     }
 }

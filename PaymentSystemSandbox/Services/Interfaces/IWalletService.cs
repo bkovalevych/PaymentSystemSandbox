@@ -10,6 +10,8 @@ namespace PaymentSystemSandbox.Services.Interfaces
         Task SendTransactionAsync(PaymentTransaction paymentTransaction);
         void SendTransaction(PaymentTransaction paymentTransaction);
         
-        decimal PaymentWithTax(decimal amount);
+        decimal PaymentTax(decimal amount);
+
+        decimal CurrentTaxInPercent { get; }
     }
 }

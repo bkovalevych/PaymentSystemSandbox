@@ -1,22 +1,18 @@
 ﻿#nullable disable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using PaymentSystemSandbox.Data;
 using PaymentSystemSandbox.Data.Entities;
+using System.Security.Claims;
 
-namespace PaymentSystemSandbox.Pages
+namespace PaymentSystemSandbox.Pages.RegularUser
 {
     public class WalletDetailsModel : PageModel
     {
-        private readonly PaymentSystemSandbox.Data.ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public WalletDetailsModel(PaymentSystemSandbox.Data.ApplicationDbContext context)
+        public WalletDetailsModel(ApplicationDbContext context)
         {
             _context = context;
         }

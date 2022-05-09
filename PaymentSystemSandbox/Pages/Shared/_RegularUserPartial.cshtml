@@ -1,0 +1,15 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using PaymentSystemSandbox.Models
+@inject SignInManager<IdentityUser> SignInManager
+
+<ul class="navbar-nav">
+@if (SignInManager.IsSignedIn(User) && !User.IsInRole(Constants.Roles.Admin))
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-page="/RegularUser/WalletDetails">Wallet Details</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-page="/RegularUser/SendMoney">Send Money</a>
+    </li>
+}
+</ul>
