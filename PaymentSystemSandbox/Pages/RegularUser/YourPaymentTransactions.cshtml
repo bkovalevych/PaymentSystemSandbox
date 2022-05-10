@@ -1,15 +1,30 @@
 ﻿@page
-@model PaymentSystemSandbox.Pages.RegularUser.UsersModel
+@model PaymentSystemSandbox.Pages.RegularUser.YourPaymentTransactionsModel
 
 @{
-    ViewData["Title"] = "Users";
+    ViewData["Title"] = "YourPaymentTransactions";
 }
 
-<h1>Users</h1>
+<h1>YourPaymentTransactions</h1>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
+<div class="row">
+    <div class="col-md-4">
+        <h3>Filter</h3>  
+        <form action="" method="get" >
+            <input type="hidden" name="offset" value="@Model.PaymentTransaction.Offset"/>
+            <input type="hidden" name="top" value="@Model.PaymentTransaction.Top"/>
+            <div class="form-group">
+                <label for="paymentType" class="control-label">Payment type is</label>
+                <select id="paymentType" name="paymentType" class="form-control col-1" 
+                    asp-for="PaymentType"
+                    asp-items="ViewBag.PaymentTypes"></select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Apply Filter</button>    
+            </div>
+        </form>
+    </div>
+</div>
 <table class="table">
     <thead>
         <tr>
@@ -53,10 +68,10 @@
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.FromWallet.UserId)
+                @Html.DisplayFor(modelItem => item.FromWallet.User.Email)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ToWallet.UserId)
+                @Html.DisplayFor(modelItem => item.ToWallet.User.Email)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Price)
@@ -67,12 +82,16 @@
             <td>
                 @Html.DisplayFor(modelItem => item.PriceWithTax)
             </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
         </tr>
 }
     </tbody>
 </table>
+
+<a href="?top=@Model.PrevTopIndex&offset=@Model.PaymentTransaction.Offset"
+   class="btn btn-primary @Model.PrevDisabled">
+    Previous
+</a>
+<a href="?top=@Model.NextTopIndex&offset=@Model.PaymentTransaction.Offset"
+   class="btn btn-primary @Model.NextDisabled">
+    Next
+</a>
