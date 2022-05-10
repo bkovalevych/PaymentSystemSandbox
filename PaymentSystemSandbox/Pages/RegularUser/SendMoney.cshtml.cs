@@ -13,7 +13,7 @@ using System.Security.Claims;
 
 namespace PaymentSystemSandbox.Pages.RegularUser
 {
-    [Authorize(Constants.Roles.Admin)]
+    [Authorize(Constants.Roles.RegularUser)]
     public class SendMoneyModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -67,7 +67,7 @@ namespace PaymentSystemSandbox.Pages.RegularUser
             }
             await _walletService.SendTransactionAsync(PaymentTransaction);
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("/Index");
         }
     }
 }

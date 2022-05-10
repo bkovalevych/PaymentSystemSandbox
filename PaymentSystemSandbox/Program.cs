@@ -22,6 +22,8 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeFolder("/RegularUser");
 });
 builder.Services.AddScoped<IWalletService, WalletService>();
+builder.Services.AddScoped<IPaymentReportsService, PaymentReportsService>();
+
 builder.Services.Configure<WalletSettings>(conf =>
 {
     builder.Configuration.GetSection(nameof(WalletSettings)).Bind(conf);
