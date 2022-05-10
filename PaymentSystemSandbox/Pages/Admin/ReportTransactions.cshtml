@@ -7,41 +7,38 @@
 
 <h1>ReportTransactions</h1>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.PaymentTransaction[0].IssuatedAt)
+                @Html.DisplayNameFor(model => model.TransactionReport.PaymentTransactions[0].IssuatedAt)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PaymentTransaction[0].ProcessedAt)
+                @Html.DisplayNameFor(model => model.TransactionReport.PaymentTransactions[0].ProcessedAt)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PaymentTransaction[0].Status)
+                @Html.DisplayNameFor(model => model.TransactionReport.PaymentTransactions[0].Status)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PaymentTransaction[0].FromWallet)
+                @Html.DisplayNameFor(model => model.TransactionReport.PaymentTransactions[0].FromWallet)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PaymentTransaction[0].ToWallet)
+                @Html.DisplayNameFor(model => model.TransactionReport.PaymentTransactions[0].ToWallet)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PaymentTransaction[0].Price)
+                @Html.DisplayNameFor(model => model.TransactionReport.PaymentTransactions[0].Price)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PaymentTransaction[0].TaxInPercent)
+                @Html.DisplayNameFor(model => model.TransactionReport.PaymentTransactions[0].TaxInPercent)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PaymentTransaction[0].PriceWithTax)
+                @Html.DisplayNameFor(model => model.TransactionReport.PaymentTransactions[0].PriceWithTax)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.PaymentTransaction) {
+@foreach (var item in Model.TransactionReport.PaymentTransactions) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.IssuatedAt)
@@ -53,10 +50,10 @@
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.FromWallet.UserId)
+                @Html.DisplayFor(modelItem => item.FromWallet.User.Email)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ToWallet.UserId)
+                @Html.DisplayFor(modelItem => item.ToWallet.User.Email)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Price)
@@ -67,12 +64,30 @@
             <td>
                 @Html.DisplayFor(modelItem => item.PriceWithTax)
             </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
         </tr>
 }
     </tbody>
 </table>
+<a href="?top=@Model.PrevTopIndex&offset=@Model.TransactionReport.Offset"
+   class="btn btn-primary @Model.PrevDisabled">
+    Previous
+</a>
+<a href="?top=@Model.NextTopIndex&offset=@Model.TransactionReport.Offset"
+   class="btn btn-primary @Model.NextDisabled">
+    Next
+</a>
+
+<dl class="row">
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.TransactionReport.TotalAmount)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.TransactionReport.TotalAmount)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.TransactionReport.TotalProfit)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.TransactionReport.TotalProfit)
+    </dd>
+</dl>

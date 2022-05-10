@@ -8,25 +8,42 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using PaymentSystemSandbox.Data;
 using PaymentSystemSandbox.Data.Entities;
+using PaymentSystemSandbox.Models;
+using PaymentSystemSandbox.Services.Interfaces;
 
 namespace PaymentSystemSandbox.Pages.Admin
 {
     public class ReportTransactionsModel : PageModel
     {
-        private readonly PaymentSystemSandbox.Data.ApplicationDbContext _context;
+        private readonly IPaymentReportsService _paymentReportsService;
 
-        public ReportTransactionsModel(PaymentSystemSandbox.Data.ApplicationDbContext context)
+        public ReportTransactionsModel(IPaymentReportsService paymentReportsService)
         {
-            _context = context;
+            _paymentReportsService = paymentReportsService;
         }
 
-        public IList<PaymentTransaction> PaymentTransaction { get;set; }
+        public TransactionReport TransactionReport { get;set; }
 
-        public async Task OnGetAsync()
+        public string NextDisabled { get; set; } = "";
+        public int NextTopIndex { get; set; } = 0;
+
+        public string PrevDisabled { get; set; } = "";
+        public int PrevTopIndex { get; set; } = 0;
+
+        public async Task OnGetAsync(int? top, int? offset)
         {
-            PaymentTransaction = await _context.PaymentTransactions
-                .Include(p => p.FromWallet)
-                .Include(p => p.ToWallet).ToListAsync();
+            TransactionReport = await _paymentReportsService.GetReportAsync(top, offset);
+            if (TransactionReport.Top + TransactionReport.Offset > TransactionReport.TotalCount)
+            {
+                NextDisabled = "disabled";
+            }
+            if (TransactionReport.Top == 0)
+            {
+                PrevDisabled = "disabled";
+            }
+
+            NextTopIndex = TransactionReport.Top + TransactionReport.Offset;
+            PrevTopIndex = Math.Max(0, TransactionReport.Top - TransactionReport.Offset);
         }
     }
 }
