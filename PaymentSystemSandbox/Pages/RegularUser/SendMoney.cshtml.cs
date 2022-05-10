@@ -36,7 +36,7 @@ namespace PaymentSystemSandbox.Pages.RegularUser
             var wallet = _context.Wallets.FirstOrDefault(it => it.UserId == userId);
             if (wallet == null)
             {
-                wallet = _walletService.InitiateWalletForUser(userId);
+                return NotFound();
             }
             ViewData["WalletId"] = wallet.Id;
             ViewData["TaxInPercent"] = _walletService.CurrentTaxInPercent;
@@ -48,7 +48,7 @@ namespace PaymentSystemSandbox.Pages.RegularUser
             ViewData["MaxPrice"] = Math.Max(0, wallet.Balance - _walletService.PaymentTax(wallet.Balance));
             ViewData["ToWalletId"] = new SelectList(_context.Wallets
                 .Include(it => it.User)
-                .Where(it => it.UserId != userId), "Id", "User.Email");
+                .Where(it => it.UserId != userId && it.User.Email != ""), "Id", "User.Email");
 
             return Page();
         }
