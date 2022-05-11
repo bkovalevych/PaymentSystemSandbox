@@ -3,10 +3,13 @@
 @inject SignInManager<IdentityUser> SignInManager
 
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User) && !User.IsInRole(Constants.Roles.Admin))
+@if (SignInManager.IsSignedIn(User) && User.IsInRole(Constants.Roles.RegularUser))
 {
     <li class="nav-item">
         <a class="nav-link text-dark" asp-area="" asp-page="/RegularUser/WalletDetails">Wallet Details</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-page="/RegularUser/YourPaymentTransactions">Your transactions</a>
     </li>
     <li class="nav-item">
         <a class="nav-link text-dark" asp-area="" asp-page="/RegularUser/SendMoney">Send Money</a>

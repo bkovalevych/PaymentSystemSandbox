@@ -25,6 +25,7 @@ namespace PaymentSystemSandbox.Helpers.Extensions
                 {
                     var regularUserPolicy = new AuthorizationPolicyBuilder()
                         .RequireAuthenticatedUser()
+                        .RequireRole(Constants.Roles.RegularUser)
                         .Build();
                     opt.AddPolicy(Constants.Roles.RegularUser, regularUserPolicy);
 

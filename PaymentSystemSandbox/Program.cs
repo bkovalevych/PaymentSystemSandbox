@@ -26,6 +26,8 @@ builder.Services.AddRazorPages(options =>
 builder.Services.AddScoped<IWalletService, WalletService>();
 builder.Services.AddScoped<IPaymentReportsService, PaymentReportsService>();
 builder.Services.AddTransient<InitRegularUserMiddleware>();
+builder.Services.AddScoped<IUserPaymentTransactionService, UserPaymentTransactionService>();
+
 builder.Services.Configure<WalletSettings>(conf =>
 {
     builder.Configuration.GetSection(nameof(WalletSettings)).Bind(conf);
