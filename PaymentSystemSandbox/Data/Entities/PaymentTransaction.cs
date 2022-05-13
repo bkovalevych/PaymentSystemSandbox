@@ -25,6 +25,8 @@ namespace PaymentSystemSandbox.Data.Entities
 
         public decimal TaxInPercent { get; set; }
 
-        public decimal PriceWithTax { get; set; } 
+        public decimal PriceWithTax { get; set; }
+        
+        public Guid OrderId { get; set; }
     }
 }

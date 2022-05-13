@@ -1,17 +1,21 @@
 ﻿using PaymentSystemSandbox.Data.Entities;
+using PaymentSystemSandbox.Data.Enums;
 
 namespace PaymentSystemSandbox.Services.Interfaces
 {
     public interface IWalletService
     {
-        Task<Wallet> InitiateWalletForUserAsync(string userId);
-        Wallet InitiateWalletForUser(string userId);
+        decimal CurrentTaxInPercent { get; }
 
-        Task SendTransactionAsync(PaymentTransaction paymentTransaction);
-        void SendTransaction(PaymentTransaction paymentTransaction);
-        
+        Task<bool> CanPaySumAsync(decimal amount, string userId);
+
+        Task<Wallet> InitiateWalletForUserAsync(string userId);
+
         decimal PaymentTax(decimal amount);
 
-        decimal CurrentTaxInPercent { get; }
+
+        Task SavePendingTransactionAsync(PaymentTransaction paymentTransaction);
+
+        Task ProcessTransactionAsync(Guid orderId, PaymentTransactionStatus status);
     }
 }

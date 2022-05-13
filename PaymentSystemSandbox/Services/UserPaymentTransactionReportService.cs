@@ -7,11 +7,11 @@ using System.Linq.Expressions;
 
 namespace PaymentSystemSandbox.Services
 {
-    public class UserPaymentTransactionService : IUserPaymentTransactionService
+    public class UserPaymentTransactionReportService : IUserPaymentTransactionReportService
     {
         private readonly ApplicationDbContext _context;
 
-        public UserPaymentTransactionService(ApplicationDbContext context)
+        public UserPaymentTransactionReportService(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -32,6 +32,7 @@ namespace PaymentSystemSandbox.Services
                 .Include(it => it.ToWallet)
                     .ThenInclude(it => it.User)
                 .Where(filter ?? (_ => true))
+                .OrderByDescending( it => it.IssuatedAt)
                 .Skip(result.Top)
                 .Take(result.Offset).ToListAsync());
 

@@ -1,14 +1,12 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PaymentSystemSandbox.Data;
 using PaymentSystemSandbox.Helpers;
 using PaymentSystemSandbox.Helpers.Extensions;
-using PaymentSystemSandbox.MiddleWares;
+using PaymentSystemSandbox.Middlewares;
 using PaymentSystemSandbox.Models;
 using PaymentSystemSandbox.Services;
 using PaymentSystemSandbox.Services.Interfaces;
-using System.Security.Claims;
+using PaymentSystemSandbox.Services.PaymentService.LiqPay.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,12 +19,12 @@ builder.Services.AddIDentity(builder.Configuration);
 
 builder.Services.AddRazorPages(options =>
 {
-    options.Conventions.AuthorizeFolder("/RegularUser");
+    options.Conventions.AuthorizeFolder("/RegularUser", Constants.Roles.RegularUser);
 });
 builder.Services.AddScoped<IWalletService, WalletService>();
 builder.Services.AddScoped<IPaymentReportsService, PaymentReportsService>();
 builder.Services.AddTransient<InitRegularUserMiddleware>();
-builder.Services.AddScoped<IUserPaymentTransactionService, UserPaymentTransactionService>();
+builder.Services.AddScoped<IUserPaymentTransactionReportService, UserPaymentTransactionReportService>();
 
 builder.Services.Configure<WalletSettings>(conf =>
 {
@@ -36,6 +34,8 @@ builder.Services.Configure<AdminSettings>(conf =>
 {
     builder.Configuration.GetSection(nameof(AdminSettings)).Bind(conf);
 });
+builder.Services.AddLiqPay(builder.Configuration);
+builder.Services.AddControllers();
 var app = builder.Build();
 using (var serviceScope = app.Services.CreateScope())
 {
@@ -61,5 +61,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<InitRegularUserMiddleware>();
 app.MapRazorPages();
-
+app.MapControllers();
 app.Run();

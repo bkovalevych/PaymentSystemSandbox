@@ -19,9 +19,9 @@ namespace PaymentSystemSandbox.Pages.RegularUser
     public class YourPaymentTransactionsModel : PageModel
     {
         private readonly PaymentSystemSandbox.Data.ApplicationDbContext _context;
-        private readonly IUserPaymentTransactionService _transactionService;
+        private readonly IUserPaymentTransactionReportService _transactionService;
 
-        public YourPaymentTransactionsModel(ApplicationDbContext context, IUserPaymentTransactionService transactionService)
+        public YourPaymentTransactionsModel(ApplicationDbContext context, IUserPaymentTransactionReportService transactionService)
         {
             _context = context;
             _transactionService = transactionService;

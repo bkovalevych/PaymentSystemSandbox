@@ -5,7 +5,7 @@ using PaymentSystemSandbox.Models;
 using PaymentSystemSandbox.Services.Interfaces;
 using System.Security.Claims;
 
-namespace PaymentSystemSandbox.MiddleWares
+namespace PaymentSystemSandbox.Middlewares
 {
     public class InitRegularUserMiddleware : IMiddleware
     {

@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace PaymentSystemSandbox.Services.Interfaces
 {
-    public interface IUserPaymentTransactionService
+    public interface IUserPaymentTransactionReportService
     {
         PagingList<PaymentTransaction> GetTransactionsByUser(string userId, int? top = 0, int? offset = 20, Expression<Func<PaymentTransaction, bool>> filter = null);
 
