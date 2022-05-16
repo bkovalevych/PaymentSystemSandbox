@@ -1,5 +1,4 @@
-﻿
-using PaymentSystemSandbox.Data.Enums;
+﻿using PaymentSystemSandbox.Data.Enums;
 
 namespace PaymentSystemSandbox.Data.Entities
 {
@@ -7,26 +6,12 @@ namespace PaymentSystemSandbox.Data.Entities
     {
         public int Id { get; set; }
 
-        public DateTimeOffset IssuatedAt { get; set; }
+        public int PaymentId { get; set; }
 
-        public DateTimeOffset ProcessedAt { get; set; }
-        
-        public PaymentTransactionStatus Status { get; set; } 
+        public Payment Payment { get; set; }
 
-        public int FromWalletId { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
-        public Wallet FromWallet { get; set; }
-
-        public int ToWalletId { get; set; }
-
-        public Wallet ToWallet { get; set; }
-
-        public decimal Price { get; set; }
-
-        public decimal TaxInPercent { get; set; }
-
-        public decimal PriceWithTax { get; set; }
-        
-        public Guid OrderId { get; set; }
+        public PaymentTransactionStatus Status { get; set; }
     }
 }

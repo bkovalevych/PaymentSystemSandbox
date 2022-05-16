@@ -4,6 +4,7 @@
     {
         Pending,
         Confirmed,
+        Reversed,
         Failed
     }
 }

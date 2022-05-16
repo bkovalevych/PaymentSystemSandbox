@@ -6,8 +6,8 @@ namespace PaymentSystemSandbox.Services.Interfaces
 {
     public interface IUserPaymentTransactionReportService
     {
-        PagingList<PaymentTransaction> GetTransactionsByUser(string userId, int? top = 0, int? offset = 20, Expression<Func<PaymentTransaction, bool>> filter = null);
+        PagingList<Payment> GetTransactionsByUser(string userId, int? top = 0, int? offset = 20, Expression<Func<Payment, bool>> filter = null);
 
-        Task<PagingList<PaymentTransaction>> GetTransactionsByUserAsync(string userId, int? top = 0, int? offset = 20, Expression<Func<PaymentTransaction, bool>> filter = default);
+        Task<PagingList<Payment>> GetTransactionsByUserAsync(string userId, int? top = 0, int? offset = 20, Expression<Func<Payment, bool>> filter = default);
     }
 }

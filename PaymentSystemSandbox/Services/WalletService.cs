@@ -51,19 +51,19 @@ namespace PaymentSystemSandbox.Services
         }
 
 
-        public async Task SavePendingTransactionAsync(PaymentTransaction paymentTransaction)
+        public async Task SavePendingTransactionAsync(Payment paymentTransaction)
         {
             paymentTransaction.IssuatedAt = DateTimeOffset.Now;
             paymentTransaction.Status = PaymentTransactionStatus.Pending;
             paymentTransaction.TaxInPercent = _walletSettings.CommissionInPercent;
             paymentTransaction.PriceWithTax = paymentTransaction.Price + PaymentTax(paymentTransaction.Price);
-            _context.PaymentTransactions.Add(paymentTransaction);
+            _context.Payments.Add(paymentTransaction);
             await _context.SaveChangesAsync();
         }
 
         public async Task ProcessTransactionAsync(Guid orderId, PaymentTransactionStatus status)
         {
-            var transaction = await _context.PaymentTransactions
+            var transaction = await _context.Payments
                 .FirstOrDefaultAsync(x => x.OrderId == orderId);
             if (transaction == null)
             {
@@ -74,11 +74,11 @@ namespace PaymentSystemSandbox.Services
             {
                 await ConfirmTransactionAsync(transaction);
             }
-            _context.PaymentTransactions.Update(transaction);
+            _context.Payments.Update(transaction);
             await _context.SaveChangesAsync();
         }
 
-        private async Task ConfirmTransactionAsync(PaymentTransaction paymentTransaction)
+        private async Task ConfirmTransactionAsync(Payment paymentTransaction)
         {
             await _context.Database.BeginTransactionAsync();
             var wallet = await _context.Wallets.FirstOrDefaultAsync(it => it.Id == paymentTransaction.FromWalletId);

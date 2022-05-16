@@ -16,14 +16,14 @@ namespace PaymentSystemSandbox.Services
             _context = context;
         }
 
-        public async Task<PagingList<PaymentTransaction>> GetTransactionsByUserAsync(string userId, int? top = 0, int? offset = 20, Expression<Func<PaymentTransaction, bool>> filter = null)
+        public async Task<PagingList<Payment>> GetTransactionsByUserAsync(string userId, int? top = 0, int? offset = 20, Expression<Func<Payment, bool>> filter = null)
         {
-            var result = new PagingList<PaymentTransaction>()
+            var result = new PagingList<Payment>()
             {
                 Top = top ?? 0,
                 Offset = offset ?? 20,
             };
-            var userPayments = _context.PaymentTransactions
+            var userPayments = _context.Payments
                 .Where(it => it.FromWallet.UserId == userId || it.ToWallet.UserId == userId);
             result.TotalCount = await userPayments.CountAsync();
             result.AddRange(await userPayments
@@ -39,14 +39,14 @@ namespace PaymentSystemSandbox.Services
             return result;
         }
 
-        public PagingList<PaymentTransaction> GetTransactionsByUser(string userId, int? top, int? offset, Expression<Func<PaymentTransaction, bool>> filter)
+        public PagingList<Payment> GetTransactionsByUser(string userId, int? top, int? offset, Expression<Func<Payment, bool>> filter)
         {
-            var result = new PagingList<PaymentTransaction>()
+            var result = new PagingList<Payment>()
             {
                 Top = top ?? 0,
                 Offset = offset ?? 20,
             };
-            var userPayments = _context.PaymentTransactions
+            var userPayments = _context.Payments
                 .Where(it => it.FromWallet.UserId == userId || it.ToWallet.UserId == userId);
             result.TotalCount = userPayments.Count();
             result.AddRange(userPayments

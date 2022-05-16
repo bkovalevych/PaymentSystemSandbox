@@ -4,7 +4,7 @@ namespace PaymentSystemSandbox.Models
 {
     public class TransactionReport
     {
-        public List<PaymentTransaction> PaymentTransactions { get; set; }
+        public List<Payment> PaymentTransactions { get; set; }
 
         public decimal TotalAmount { get; set; }
 

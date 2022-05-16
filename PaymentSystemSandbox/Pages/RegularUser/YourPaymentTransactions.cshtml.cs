@@ -27,7 +27,7 @@ namespace PaymentSystemSandbox.Pages.RegularUser
             _transactionService = transactionService;
         }
 
-        public PagingList<PaymentTransaction> PaymentTransaction { get;set; }
+        public PagingList<Payment> PaymentTransaction { get;set; }
 
         public string NextDisabled { get; set; } = "";
         public int NextTopIndex { get; set; } = 0;
@@ -64,7 +64,7 @@ namespace PaymentSystemSandbox.Pages.RegularUser
                 it.Selected = true;
             };
             ViewData["PaymentTypes"] = list; 
-            Expression<Func<PaymentTransaction, bool>> filter = PaymentType switch
+            Expression<Func<Payment, bool>> filter = PaymentType switch
             {
                 "From me" => it => it.FromWallet.UserId == userId,
                 "To me" => it => it.ToWallet.UserId == userId,

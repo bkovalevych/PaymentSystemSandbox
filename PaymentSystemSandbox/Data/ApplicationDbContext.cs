@@ -13,6 +13,8 @@ namespace PaymentSystemSandbox.Data
 
         public DbSet<Wallet> Wallets { get; set; }
 
+        public DbSet<Payment> Payments { get; set; }
+
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

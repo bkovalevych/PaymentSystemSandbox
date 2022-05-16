@@ -43,7 +43,7 @@ namespace PaymentSystemSandbox.Pages.RegularUser
             }
             ViewData["WalletId"] = wallet.Id;
             ViewData["TaxInPercent"] = _walletService.CurrentTaxInPercent;
-            PaymentTransaction = new PaymentTransaction()
+            PaymentTransaction = new Payment()
             {
                 FromWalletId = wallet.Id,
                 Price = 12M
@@ -51,13 +51,13 @@ namespace PaymentSystemSandbox.Pages.RegularUser
             ViewData["MaxPrice"] = Math.Max(0, wallet.Balance - _walletService.PaymentTax(wallet.Balance));
             ViewData["ToWalletId"] = new SelectList(_context.Wallets
                 .Include(it => it.User)
-                .Where(it => it.UserId != userId && it.User.Email != ""), "Id", "User.Email");
+                .Where(it => it.UserId != userId && it.User.Email != null), "Id", "User.Email");
 
             return Page();
         }
 
         [BindProperty]
-        public PaymentTransaction PaymentTransaction { get; set; }
+        public Payment PaymentTransaction { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
         {

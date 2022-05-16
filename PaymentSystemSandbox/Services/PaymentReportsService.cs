@@ -20,7 +20,7 @@ namespace PaymentSystemSandbox.Services
                 Top = top ?? 0,
                 Offset = offset ?? 20,
             };
-            var payments = _context.PaymentTransactions;
+            var payments = _context.Payments;
             result.PaymentTransactions = payments
                 .OrderByDescending(it => it.IssuatedAt)
                 .Skip(top ?? 0)
@@ -41,7 +41,7 @@ namespace PaymentSystemSandbox.Services
                 Top = top ?? 0,
                 Offset = offset ?? 20,
             };
-            var payments = _context.PaymentTransactions;
+            var payments = _context.Payments;
             result.PaymentTransactions = await payments
                 .Include(it => it.FromWallet)
                     .ThenInclude(it => it.User)

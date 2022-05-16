@@ -25,7 +25,7 @@ namespace PaymentSystemSandbox.Controllers
         [HttpPost("pending")]
         public async Task<IActionResult> Post([FromBody] PaymentTransactionDto paymentTransactionDto)
         {
-            var transaction = new PaymentTransaction()
+            var transaction = new Payment()
             {
                 FromWalletId = paymentTransactionDto.FromWalletId,
                 ToWalletId = paymentTransactionDto.ToWalletId,

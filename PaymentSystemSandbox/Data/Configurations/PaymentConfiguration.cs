@@ -4,9 +4,9 @@ using PaymentSystemSandbox.Data.Entities;
 
 namespace PaymentSystemSandbox.Data.Configurations
 {
-    public class TransactionConfiguration : IEntityTypeConfiguration<PaymentTransaction>
+    public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
     {
-        public void Configure(EntityTypeBuilder<PaymentTransaction> builder)
+        public void Configure(EntityTypeBuilder<Payment> builder)
         {
             builder.HasOne(transaction => transaction.ToWallet)
                 .WithMany()
