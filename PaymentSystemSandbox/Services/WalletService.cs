@@ -51,30 +51,43 @@ namespace PaymentSystemSandbox.Services
         }
 
 
-        public async Task SavePendingTransactionAsync(Payment paymentTransaction)
+        public async Task SavePendingTransactionAsync(Payment payment)
         {
-            paymentTransaction.IssuatedAt = DateTimeOffset.Now;
-            paymentTransaction.Status = PaymentTransactionStatus.Pending;
-            paymentTransaction.TaxInPercent = _walletSettings.CommissionInPercent;
-            paymentTransaction.PriceWithTax = paymentTransaction.Price + PaymentTax(paymentTransaction.Price);
-            _context.Payments.Add(paymentTransaction);
+            payment.IssuatedAt = DateTimeOffset.Now;
+            payment.Status = PaymentTransactionStatus.Pending;
+            payment.TaxInPercent = _walletSettings.CommissionInPercent;
+            payment.PriceWithTax = payment.Price + PaymentTax(payment.Price);
+            payment.PaymentTransactions.Add(new PaymentTransaction()
+            {
+                CreatedAt = payment.IssuatedAt,
+                Payment = payment,
+                Status = PaymentTransactionStatus.Pending
+            });
+            _context.Payments.Add(payment);
+
             await _context.SaveChangesAsync();
         }
 
         public async Task ProcessTransactionAsync(Guid orderId, PaymentTransactionStatus status)
         {
-            var transaction = await _context.Payments
+            var payment = await _context.Payments
                 .FirstOrDefaultAsync(x => x.OrderId == orderId);
-            if (transaction == null)
+            if (payment == null)
             {
                 return;
             }
-            transaction.Status = status;
+            payment.Status = status;
+            payment.PaymentTransactions.Add(new PaymentTransaction()
+            {
+                CreatedAt = DateTimeOffset.Now,
+                Payment = payment,
+                Status = status
+            });
             if (status == PaymentTransactionStatus.Confirmed)
             {
-                await ConfirmTransactionAsync(transaction);
+                await ConfirmTransactionAsync(payment);
             }
-            _context.Payments.Update(transaction);
+            _context.Payments.Update(payment);
             await _context.SaveChangesAsync();
         }
 
