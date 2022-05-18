@@ -9,8 +9,8 @@ namespace PaymentSystemSandbox.Services.Interfaces
 
         LiqPayRequest EncryptApiPayload<TPayload>(TPayload payload);
 
-        public bool IsValid(LiqPayRequest liqPay);
+        bool IsValid(LiqPayRequest liqPay);
 
-        public TPayload DecryptApiPayload<TPayload>(LiqPayRequest liqPay);
+        TPayload DecryptApiPayload<TPayload>(LiqPayRequest liqPay);
     }
 }

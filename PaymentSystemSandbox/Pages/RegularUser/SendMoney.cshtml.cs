@@ -70,8 +70,8 @@ namespace PaymentSystemSandbox.Pages.RegularUser
             }
 
             await _walletService.SavePendingTransactionAsync(PaymentTransaction);
-
-            return RedirectToPage("/Index");
+            
+            return Redirect("/Index");
         }
 
         public async Task<PartialViewResult> OnGetPayButtonPartial(decimal amount)
