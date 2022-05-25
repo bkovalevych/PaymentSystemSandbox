@@ -20,8 +20,12 @@
                 <select id="ToWalletId" asp-for="PaymentTransaction.ToWalletId" class ="form-control" asp-items="ViewBag.ToWalletId"></select>
             </div>
             <div class="form-group">
+                <label  asp-for="SelectedPayment" class="control-label"></label>
+                <select id="SelectedPayment" asp-for="SelectedPayment" class ="form-control" asp-items="ViewBag.Payments"></select>
+            </div>
+            <div class="form-group">
                 <label asp-for="PaymentTransaction.Price" class="control-label"></label>
-                <input id="Price" asp-for="PaymentTransaction.Price" class="form-control" max="@ViewBag.MaxPrice"/>
+                <input id="Price" asp-for="PaymentTransaction.Price" class="form-control" max="@ViewBag.MaxPrice" min="@ViewBag.MinPrice"/>
                 <span asp-validation-for="PaymentTransaction.Price" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -47,29 +51,18 @@
                     $("#pay_btn").load(`?handler=PayButtonPartial&amount=${value}`);
                 }
             });
-            $("#pay_btn").load('?handler=PayButtonPartial&amount=12');
-            $("#walletForm").on("submit", function(e) {
-                e.preventDefault();
-                debugger;
-                let data = {
-                    toWalletId: $("#ToWalletId").val(),
-                    fromWalletId: $("#FromWalletId").val(),
-                    price: $("#Price").val(),
-                    orderId: $("#orderId").val()
-                };
-                $.ajax({
-                    method: "POST",
-                    url: "/api/webHooks/pending",
-                    data: JSON.stringify(data),
-                    contentType: "application/json",
-                    dataType: "application/json",
-                    accepts: "*/*",
-                    complete: (data) => {
-                        debugger;
-                        let it = $("#payForm");
-                        it.submit().appendTo("#pay_page");
-                    }
-                })
+            $("#pay_btn").load('?handler=PayButtonPartial&amount=30');
+            $("#SelectedPayment").on('change', function (event) {
+                var payment = event.target.value;
+                if (payment) {
+                    $.ajax({
+                        method: "get",
+                        url: `?handler=PaymentChange&payment=${payment}`
+                    }).then(minPrice => {
+                        $("#Price").attr({"min": minPrice});
+                        $("#Price").focusout();
+                    });
+                }
             })
         });
     </script>

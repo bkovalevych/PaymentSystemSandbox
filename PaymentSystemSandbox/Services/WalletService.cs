@@ -51,12 +51,13 @@ namespace PaymentSystemSandbox.Services
         }
 
 
-        public async Task SavePendingTransactionAsync(Payment payment)
+        public async Task<Guid> SavePendingTransactionAsync(Payment payment)
         {
             payment.IssuatedAt = DateTimeOffset.Now;
             payment.Status = PaymentTransactionStatus.Pending;
             payment.TaxInPercent = _walletSettings.CommissionInPercent;
             payment.PriceWithTax = payment.Price + PaymentTax(payment.Price);
+            payment.OrderId = Guid.NewGuid();
             payment.PaymentTransactions.Add(new PaymentTransaction()
             {
                 CreatedAt = payment.IssuatedAt,
@@ -66,6 +67,7 @@ namespace PaymentSystemSandbox.Services
             _context.Payments.Add(payment);
 
             await _context.SaveChangesAsync();
+            return payment.OrderId;
         }
 
         public async Task ProcessTransactionAsync(Guid orderId, PaymentTransactionStatus status)

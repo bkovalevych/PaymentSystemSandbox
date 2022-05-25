@@ -14,7 +14,7 @@ namespace PaymentSystemSandbox.Services.Interfaces
         decimal PaymentTax(decimal amount);
 
 
-        Task SavePendingTransactionAsync(Payment paymentTransaction);
+        Task<Guid> SavePendingTransactionAsync(Payment paymentTransaction);
 
         Task ProcessTransactionAsync(Guid orderId, PaymentTransactionStatus status);
     }

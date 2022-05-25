@@ -1,9 +1,12 @@
-﻿using PaymentSystemSandbox.Services.PaymentService.LiqPay.Models;
+﻿using PaymentSystemSandbox.Services.PaymentService.LiqPay.ConfigurationModels;
+using PaymentSystemSandbox.Services.PaymentService.LiqPay.Models;
 namespace PaymentSystemSandbox.Services.Interfaces
 {
     public interface ILiqPayBaseService
     {
         string ApiUrl { get; }
+
+        public LiqPayCommandSettings CommandSettings { get; }
 
         void FillWithConfiguredValues(BaseLiqPayCommand command);
 

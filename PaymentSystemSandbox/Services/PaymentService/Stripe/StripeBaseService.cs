@@ -2,48 +2,65 @@
 using PaymentSystemSandbox.Services.PaymentService.Stripe.ConfigurationModels;
 using Stripe;
 using Stripe.Checkout;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PaymentSystemSandbox.Services.PaymentService.Stripe
 {
     public class StripeBaseService
     {
-        private readonly string _host;
         private readonly string _priceId;
-        public StripeBaseService(IOptions<StripeSettings> stripeSettings, IWebHostEnvironment webHost)
+        private readonly string _accountId;
+        private readonly StripeSettings _settings;
+        public StripeBaseService(IOptions<StripeSettings> stripeSettings, 
+            IOptions<StripeCommandSettings> stripeCommandSettings,
+            IHttpContextAccessor contextAccessor)
         {
             StripeConfiguration.ApiKey = stripeSettings.Value.PrivateKey;
-            _host = webHost.WebRootPath;
+            _accountId = stripeSettings.Value.AccountId;
             _priceId = InitDefaultPrice();
+            _settings = stripeSettings.Value;
+            CommandSettings = stripeCommandSettings.Value;
         }
+
+        public StripeCommandSettings CommandSettings { get; }
+
 
         private string InitDefaultPrice()
         {
+            var search = new PriceSearchOptions()
+            {
+                Limit = 1, 
+                Query = "active:'true' AND metaData['name']:'Charge card'"
+            };
+            var priceService = new PriceService();
+            var resultSearch = priceService.Search(search);
+            if (resultSearch.Data != null && resultSearch.Data.FirstOrDefault() is Price foundPrice)
+            {
+                return foundPrice.Id;
+            }
+
             var defaultProduct = new PriceCreateOptions()
             {
-                
                 Active = true,
-                BillingScheme = "unit_amount_decimal",
+                BillingScheme = "per_unit",
                 Currency = "uah",
                 ProductData = new PriceProductDataOptions()
                 {
                     Active = true,
-                    Name = "Charge card"
+                    Name = "Charge card",
                 },
-                UnitAmountDecimal = 100,
-                Nickname = "default price"
+                UnitAmountDecimal = 1m,
+                Nickname = "default price",
+                Metadata = new Dictionary<string, string>()
+                {
+                    ["name"] = "Charge card"
+                }
             };
-            
-            var price = new PriceService()
-                .Create(defaultProduct);
+
+            var price = priceService.Create(defaultProduct);
             return price.Id;
         }
 
-        public string GetPaymentUrl(string orderId, decimal total)
+        public async Task<string> GetPaymentUrl(string orderId, decimal total)
         {
             var options = new SessionCreateOptions
             {
@@ -51,18 +68,32 @@ namespace PaymentSystemSandbox.Services.PaymentService.Stripe
                 {
                   new SessionLineItemOptions
                   {
-                      Currency = "UAH",
                       Price = _priceId,
                       Quantity = (long)(total * 100m)
                   },
                 },
+                Metadata = new Dictionary<string, string>()
+                {
+                    ["orderId"] = orderId
+                },
                 Mode = "payment",
-                SuccessUrl = _host,
-                CancelUrl = _host + "/cancel.html",
+                SuccessUrl = CommandSettings.SuccessUrl,
+                CancelUrl = CommandSettings.SuccessUrl
             };
             var service = new SessionService();
-            Session session = service.Create(options);
+            Session session = await service.CreateAsync(options, new RequestOptions() { StripeAccount = _accountId});
             return session.Url;
+        }
+
+        public Event ValidatePayload(string rawRequest, string signature)
+        {
+            var stripeEvent = EventUtility.ConstructEvent(
+              rawRequest,
+              signature,
+              _settings.WebHookCheckoutSecretKey
+            );
+
+            return stripeEvent;
         }
     }
 }

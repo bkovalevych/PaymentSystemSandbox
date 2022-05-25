@@ -2,10 +2,5 @@
 @model PayButtonPartialModel
 
 <span>The tax is @Model.Tax %. The total price will be @Model.Total uah</span>
-<input type="hidden" name="orderId" id="orderId" value="@Model.OrderId"/>
-<form method="POST" action="https://www.liqpay.ua/api/3/checkout" accept-charset="utf-8" id="payForm">
- <input type="hidden" name="data" value="@Model.LiqPay.Data"/>
- <input type="hidden" name="signature" value="@Model.LiqPay.Signature"/>
-</form>
 
 

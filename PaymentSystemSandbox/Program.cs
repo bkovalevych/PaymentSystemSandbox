@@ -6,7 +6,9 @@ using PaymentSystemSandbox.Middlewares;
 using PaymentSystemSandbox.Models;
 using PaymentSystemSandbox.Services;
 using PaymentSystemSandbox.Services.Interfaces;
+using PaymentSystemSandbox.Services.PaymentService.Abstractions;
 using PaymentSystemSandbox.Services.PaymentService.LiqPay.Extensions;
+using PaymentSystemSandbox.Services.PaymentService.Stripe.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +37,8 @@ builder.Services.Configure<AdminSettings>(conf =>
     builder.Configuration.GetSection(nameof(AdminSettings)).Bind(conf);
 });
 builder.Services.AddLiqPay(builder.Configuration);
+builder.Services.AddStripe(builder.Configuration);
+builder.Services.AddScoped<PaymentCheckoutFactory>();
 builder.Services.AddControllers();
 var app = builder.Build();
 using (var serviceScope = app.Services.CreateScope())

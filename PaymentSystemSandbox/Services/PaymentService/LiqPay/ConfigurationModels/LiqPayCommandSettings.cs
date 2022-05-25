@@ -9,5 +9,7 @@
         public string ServerUrl { get; set; }
 
         public string ApiUrl { get; set; }
+
+        public decimal MinPrice { get; set; }
     }
 }

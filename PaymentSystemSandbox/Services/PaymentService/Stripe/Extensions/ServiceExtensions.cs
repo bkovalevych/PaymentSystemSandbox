@@ -11,7 +11,9 @@ namespace PaymentSystemSandbox.Services.PaymentService.Stripe.Extensions
             services.Configure<StripeSettings>(opt =>
                 configuration.GetSection(nameof(StripeSettings)).Bind(opt));
 
-            services.AddScoped<IStripeBaseService, StripeBaseService>();
+            services.AddScoped<StripeBaseService>();
+            services.AddScoped<StripePaymentCheckoutAdapter>();
+
             return services;
         }
     }

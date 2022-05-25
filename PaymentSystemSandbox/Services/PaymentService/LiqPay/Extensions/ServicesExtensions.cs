@@ -13,6 +13,7 @@ namespace PaymentSystemSandbox.Services.PaymentService.LiqPay.Extensions
                 configuration.GetSection(nameof(LiqPaySettings)).Bind(opt));
 
             services.AddScoped<ILiqPayBaseService, LiqPayBaseService>();
+            services.AddScoped<LiqpayPaymentCheckoutAdapter>();
             return services;
         }
     }

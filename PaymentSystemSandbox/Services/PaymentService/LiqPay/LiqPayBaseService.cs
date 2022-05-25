@@ -12,14 +12,13 @@ namespace PaymentSystemSandbox.Services.PaymentService.LiqPay
     public class LiqPayBaseService : ILiqPayBaseService
     {
         private readonly LiqPaySettings _settings;
-        private readonly LiqPayCommandSettings _commandSettings;
         private readonly JsonSerializerSettings _serializationSettings;
 
         public LiqPayBaseService(IOptions<LiqPaySettings> liqPaySettings, 
             IOptions<LiqPayCommandSettings> liqPayCommandSettings)
         {
             _settings = liqPaySettings.Value;
-            _commandSettings = liqPayCommandSettings.Value;
+            CommandSettings = liqPayCommandSettings.Value;
             _serializationSettings = new JsonSerializerSettings
             {
                 ContractResolver = new DefaultContractResolver
@@ -29,16 +28,19 @@ namespace PaymentSystemSandbox.Services.PaymentService.LiqPay
                 DateFormatString = "yyyy-mm-dd hh:mm:ss",
                 Formatting = Formatting.None
             };
-            ApiUrl = _commandSettings.ApiUrl;
+            ApiUrl = CommandSettings.ApiUrl;
         }
+
+
+        public LiqPayCommandSettings CommandSettings { get; }
 
         public string ApiUrl { get; }
 
         public void FillWithConfiguredValues(BaseLiqPayCommand command)
         {
-            command.Version = _commandSettings.Version;
-            command.Currency = _commandSettings.Currency;
-            command.ServerUrl = _commandSettings.ServerUrl;
+            command.Version = CommandSettings.Version;
+            command.Currency = CommandSettings.Currency;
+            command.ServerUrl = CommandSettings.ServerUrl;
             command.PublicKey = _settings.PublicKey;
         }
 

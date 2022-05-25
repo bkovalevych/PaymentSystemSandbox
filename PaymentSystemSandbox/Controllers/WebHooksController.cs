@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PaymentSystemSandbox.Services.Interfaces;
-using PaymentSystemSandbox.Services.PaymentService.LiqPay.Models;
-using PaymentSystemSandbox.Data.Enums;
-using PaymentSystemSandbox.Data.Entities;
-using PaymentSystemSandbox.Models;
+using PaymentSystemSandbox.Services.PaymentService.Abstractions;
 
 namespace PaymentSystemSandbox.Controllers
 {
@@ -11,73 +8,46 @@ namespace PaymentSystemSandbox.Controllers
     [Route("api/[controller]")]
     public class WebHooksController : ControllerBase
     {
-        private readonly ILiqPayBaseService _liqPayService;
+        private readonly PaymentCheckoutFactory _factory;
         private readonly IWalletService _walletService;
         private readonly ILogger<WebHooksController> _logger;
-        public WebHooksController(ILiqPayBaseService liqPayBaseService, IWalletService walletService, 
+
+        public WebHooksController(PaymentCheckoutFactory factory, IWalletService walletService,
             ILogger<WebHooksController> logger)
         {
-            _liqPayService = liqPayBaseService;
+            _factory = factory;
             _walletService = walletService;
             _logger = logger;
         }
 
-        [HttpPost("pending")]
-        public async Task<IActionResult> Post([FromBody] PaymentTransactionDto paymentTransactionDto)
+        [HttpPost("liqpay")]
+        public async Task<IActionResult> PostFromLiqPay(CancellationToken cancellationToken)
         {
-            var transaction = new Payment()
-            {
-                FromWalletId = paymentTransactionDto.FromWalletId,
-                ToWalletId = paymentTransactionDto.ToWalletId,
-                Price = paymentTransactionDto.Price,
-                OrderId = paymentTransactionDto.OrderId
-            };
-            await _walletService.SavePendingTransactionAsync(transaction);
-            return Ok("ok");
+            return await FulfillOrderByPaymentName("LiqPay", cancellationToken);
         }
 
-        [HttpPost("liqpay")]
-        public async Task<IActionResult> PostFromLiqPay([FromForm] LiqPayRequest rawLiqPay)
+        [HttpPost("stripe")]
+        public async Task<IActionResult> PostFromStripe(CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning("Invalid payload");
-                return Ok();
-            }
+            return await FulfillOrderByPaymentName("Stripe", cancellationToken);
+        }
 
-            if (!_liqPayService.IsValid(rawLiqPay))
-            {
-                _logger.LogWarning("Invalid payload");
-                return BadRequest();
-            }
-            LiqPayResponse response;
+        private async Task<IActionResult> FulfillOrderByPaymentName(string paymentName, CancellationToken cancellationToken)
+        {
+            string rawLiqPay = await new StreamReader(Request.Body).ReadToEndAsync();
             try
             {
-                response = _liqPayService.DecryptApiPayload<LiqPayResponse>(rawLiqPay);
-                await ProcessLiqPay(response);
+                var service = _factory.GetServiceByName(paymentName);
+                var (orderId, status) = await service.FulfillPayment(rawLiqPay, cancellationToken);
+                await _walletService.ProcessTransactionAsync(orderId, status);
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("Error on processing. Message: {0}", ex.Message);
+                _logger.LogWarning("Error on processing. Payment: {0}. Message: {1}", paymentName, ex.Message);
                 return BadRequest();
             }
 
             return Ok();
         }
-
-        private async Task ProcessLiqPay(LiqPayResponse response)
-        {
-            var id = new Guid(response.OrderId);
-            
-            var status = response.Status switch
-            {
-                "success" => PaymentTransactionStatus.Confirmed,
-                "sandbox" => PaymentTransactionStatus.Confirmed,
-                _ => PaymentTransactionStatus.Failed
-            };
-            _logger.LogDebug("Start processing transaction. Status {0}. Id {1}", status, id);
-            await _walletService.ProcessTransactionAsync(id, status);
-        }
-
     }
 }
