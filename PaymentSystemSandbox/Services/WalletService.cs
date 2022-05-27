@@ -79,6 +79,7 @@ namespace PaymentSystemSandbox.Services
                 return;
             }
             payment.Status = status;
+            payment.ProcessedAt = DateTimeOffset.Now;
             payment.PaymentTransactions.Add(new PaymentTransaction()
             {
                 CreatedAt = DateTimeOffset.Now,

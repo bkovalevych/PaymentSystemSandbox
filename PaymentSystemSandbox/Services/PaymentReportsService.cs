@@ -17,10 +17,10 @@ namespace PaymentSystemSandbox.Services
         {
             var result = new TransactionReport()
             {
-                Top = top ?? 0,
-                Offset = offset ?? 20,
+                Offset = top ?? 0,
+                Fetch = offset ?? 20,
             };
-            var payments = _context.Payments;
+            var payments = _context.Payments.AsEnumerable();
             result.PaymentTransactions = payments
                 .OrderByDescending(it => it.IssuatedAt)
                 .Skip(top ?? 0)
@@ -38,22 +38,24 @@ namespace PaymentSystemSandbox.Services
 
             var result = new TransactionReport()
             {
-                Top = top ?? 0,
-                Offset = offset ?? 20,
+                Offset = top ?? 0,
+                Fetch = offset ?? 20,
             };
-            var payments = _context.Payments;
-            result.PaymentTransactions = await payments
+            var payments = _context.Payments
                 .Include(it => it.FromWallet)
                     .ThenInclude(it => it.User)
                 .Include(it => it.ToWallet)
                     .ThenInclude(it => it.User)
+                .AsEnumerable();
+
+            result.PaymentTransactions = payments
                 .OrderByDescending(it => it.IssuatedAt)
                 .Skip(top ?? 0)
                 .Take(offset ?? 20)
-                .ToListAsync();
-            result.TotalCount = await payments.CountAsync();
-            result.TotalAmount = await payments.SumAsync(it => it.PriceWithTax);
-            result.TotalProfit = result.TotalAmount - await payments.SumAsync(it => it.Price);
+                .ToList();
+            result.TotalCount = payments.Count();
+            result.TotalAmount = payments.Sum(it => it.PriceWithTax);
+            result.TotalProfit = result.TotalAmount - payments.Sum(it => it.Price);
 
             return result;
         }

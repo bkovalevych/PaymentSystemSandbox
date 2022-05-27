@@ -12,8 +12,8 @@ namespace PaymentSystemSandbox.Models
 
         public int TotalCount { get; set; }
 
-        public int Offset { get; set; }
+        public int Fetch { get; set; }
 
-        public int Top { get; set; }
+        public int Offset { get; set; }
     }
 }

@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PaymentSystemSandbox", "PaymentSystemSandbox\PaymentSystemSandbox.csproj", "{580C60AF-E038-47B2-A29C-12DDDD53C34E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentSystemSandbox.Tests", "PaymentSystemSandbox.Tests\PaymentSystemSandbox.Tests.csproj", "{B828D20B-EFAA-4ABF-BCC6-ED6577AC0FA1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PaymentSystemSandbox.Tests", "PaymentSystemSandbox.Tests\PaymentSystemSandbox.Tests.csproj", "{B828D20B-EFAA-4ABF-BCC6-ED6577AC0FA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

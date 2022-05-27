@@ -64,15 +64,18 @@
             <td>
                 @Html.DisplayFor(modelItem => item.PriceWithTax)
             </td>
+            <td>
+                <a href="./ReportPaymentDetails/?paymentId=@item.Id">Details</a>
+            </td>
         </tr>
 }
     </tbody>
 </table>
-<a href="?top=@Model.PrevTopIndex&offset=@Model.TransactionReport.Offset"
+<a href="?top=@Model.PrevTopIndex&offset=@Model.TransactionReport.Fetch"
    class="btn btn-primary @Model.PrevDisabled">
     Previous
 </a>
-<a href="?top=@Model.NextTopIndex&offset=@Model.TransactionReport.Offset"
+<a href="?top=@Model.NextTopIndex&offset=@Model.TransactionReport.Fetch"
    class="btn btn-primary @Model.NextDisabled">
     Next
 </a>

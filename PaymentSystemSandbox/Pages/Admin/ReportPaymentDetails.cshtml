@@ -1,0 +1,76 @@
+﻿@page
+@model PaymentSystemSandbox.Pages.Admin.ReportPaymentDetailsModel
+
+<h1>Payment Details</h1>
+
+<div>
+    <h4>Payment</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Payment.FromWallet)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Payment.FromWallet.User.Email)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Payment.ToWallet)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Payment.ToWallet.User.Email)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Payment.Status)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Payment.Status)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Payment.Price)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Payment.Price)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Payment.PriceWithTax)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Payment.PriceWithTax)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Payment.TaxInPercent)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Payment.TaxInPercent)
+        </dd>
+    </dl>
+</div>
+<h4>Payment Transactions</h4>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Payment.PaymentTransactions[0].CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Payment.PaymentTransactions[0].Status)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Payment.PaymentTransactions) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<div>
+    <a href="/Admin/ReportTransactions">Back to List</a>
+</div>
