@@ -5,14 +5,13 @@ using PaymentSystemSandbox.Data.Entities;
 using PaymentSystemSandbox.Data.Enums;
 using PaymentSystemSandbox.Models;
 using PaymentSystemSandbox.Services.Interfaces;
-using System.Transactions;
 
 namespace PaymentSystemSandbox.Services
 {
     public class WalletService : IWalletService
     {
         private readonly ApplicationDbContext _context;
-        
+
         private readonly WalletSettings _walletSettings;
 
         public WalletService(ApplicationDbContext context, IOptions<WalletSettings> walletSettings)
@@ -23,16 +22,14 @@ namespace PaymentSystemSandbox.Services
 
         public decimal CurrentTaxInPercent => _walletSettings.CommissionInPercent;
 
-        public Wallet InitiateWalletForUser(string userId)
+        public async Task<bool> CanPaySumAsync(decimal amount, string userId)
         {
-            var wallet = new Wallet()
+            var wallet = await _context.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
+            if (wallet == null)
             {
-                UserId = userId,
-                Balance = _walletSettings.InitialBalance
-            };
-            _context.Add(wallet);
-            _context.SaveChanges();
-            return wallet;
+                return false;
+            }
+            return CanPaySum(amount, wallet.Balance);
         }
 
         public async Task<Wallet> InitiateWalletForUserAsync(string userId)
@@ -53,46 +50,55 @@ namespace PaymentSystemSandbox.Services
             return result;
         }
 
-        public void SendTransaction(PaymentTransaction paymentTransaction)
-        {
-            _context.Database.BeginTransaction();
-            var wallet = _context.Wallets.FirstOrDefault(it => it.Id == paymentTransaction.FromWalletId);
-            var toWallet = _context.Wallets.FirstOrDefault(it => it.Id == paymentTransaction.ToWalletId);
-            paymentTransaction.Status = PaymentTransactionStatus.Confirmed;
-            paymentTransaction.IssuatedAt = DateTimeOffset.Now;
-            paymentTransaction.TaxInPercent = _walletSettings.CommissionInPercent;
-            paymentTransaction.PriceWithTax = paymentTransaction.Price + PaymentTax(paymentTransaction.Price);
 
-            if (wallet.Balance < paymentTransaction.PriceWithTax)
+        public async Task<Guid> SavePendingTransactionAsync(Payment payment)
+        {
+            payment.IssuatedAt = DateTimeOffset.Now;
+            payment.Status = PaymentTransactionStatus.Pending;
+            payment.TaxInPercent = _walletSettings.CommissionInPercent;
+            payment.PriceWithTax = payment.Price + PaymentTax(payment.Price);
+            payment.OrderId = Guid.NewGuid();
+            payment.PaymentTransactions.Add(new PaymentTransaction()
+            {
+                CreatedAt = payment.IssuatedAt,
+                Payment = payment,
+                Status = PaymentTransactionStatus.Pending
+            });
+            _context.Payments.Add(payment);
+
+            await _context.SaveChangesAsync();
+            return payment.OrderId;
+        }
+
+        public async Task ProcessTransactionAsync(Guid orderId, PaymentTransactionStatus status)
+        {
+            var payment = await _context.Payments
+                .FirstOrDefaultAsync(x => x.OrderId == orderId);
+            if (payment == null)
             {
                 return;
             }
-            wallet.Balance -= paymentTransaction.PriceWithTax;
-            toWallet.Balance += paymentTransaction.Price;
-            try
+            payment.Status = status;
+            payment.ProcessedAt = DateTimeOffset.Now;
+            payment.PaymentTransactions.Add(new PaymentTransaction()
             {
-                _context.Add(paymentTransaction);
-                _context.Wallets.Update(wallet);
-                _context.Wallets.Update(toWallet);
-                _context.SaveChanges();
-            }
-            catch (Exception ex)
+                CreatedAt = DateTimeOffset.Now,
+                Payment = payment,
+                Status = status
+            });
+            if (status == PaymentTransactionStatus.Confirmed)
             {
-                _context.Database.RollbackTransaction();
+                await ConfirmTransactionAsync(payment);
             }
-
-            _context.Database.CommitTransaction();
+            _context.Payments.Update(payment);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task SendTransactionAsync(PaymentTransaction paymentTransaction)
+        private async Task ConfirmTransactionAsync(Payment paymentTransaction)
         {
             await _context.Database.BeginTransactionAsync();
             var wallet = await _context.Wallets.FirstOrDefaultAsync(it => it.Id == paymentTransaction.FromWalletId);
             var toWallet = await _context.Wallets.FirstOrDefaultAsync(it => it.Id == paymentTransaction.ToWalletId);
-            paymentTransaction.Status = PaymentTransactionStatus.Confirmed;
-            paymentTransaction.IssuatedAt = DateTimeOffset.Now;
-            paymentTransaction.TaxInPercent = _walletSettings.CommissionInPercent;
-            paymentTransaction.PriceWithTax = paymentTransaction.Price + PaymentTax(paymentTransaction.Price);
             
             if (wallet.Balance < paymentTransaction.PriceWithTax)
             {
@@ -102,17 +108,21 @@ namespace PaymentSystemSandbox.Services
             toWallet.Balance += paymentTransaction.Price;
             try
             {
-                _context.Add(paymentTransaction);
                 _context.Wallets.Update(wallet);
                 _context.Wallets.Update(toWallet);
                 _context.SaveChanges();
-            } 
+            }
             catch (Exception ex)
             {
                 await _context.Database.RollbackTransactionAsync();
             }
-            
+
             await _context.Database.CommitTransactionAsync();
+        }
+
+        private bool CanPaySum(decimal amount, decimal balance)
+        {
+            return balance >= amount + PaymentTax(amount);
         }
     }
 }

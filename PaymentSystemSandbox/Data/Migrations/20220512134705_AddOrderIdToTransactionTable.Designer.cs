@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PaymentSystemSandbox.Data;
 
@@ -11,9 +12,10 @@ using PaymentSystemSandbox.Data;
 namespace PaymentSystemSandbox.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220512134705_AddOrderIdToTransactionTable")]
+    partial class AddOrderIdToTransactionTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -224,7 +226,7 @@ namespace PaymentSystemSandbox.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PaymentSystemSandbox.Data.Entities.Payment", b =>
+            modelBuilder.Entity("PaymentSystemSandbox.Data.Entities.PaymentTransaction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -265,31 +267,6 @@ namespace PaymentSystemSandbox.Data.Migrations
                     b.HasIndex("FromWalletId");
 
                     b.HasIndex("ToWalletId");
-
-                    b.ToTable("Payments");
-                });
-
-            modelBuilder.Entity("PaymentSystemSandbox.Data.Entities.PaymentTransaction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int>("PaymentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PaymentId");
 
                     b.ToTable("PaymentTransactions");
                 });
@@ -368,7 +345,7 @@ namespace PaymentSystemSandbox.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PaymentSystemSandbox.Data.Entities.Payment", b =>
+            modelBuilder.Entity("PaymentSystemSandbox.Data.Entities.PaymentTransaction", b =>
                 {
                     b.HasOne("PaymentSystemSandbox.Data.Entities.Wallet", "FromWallet")
                         .WithMany()
@@ -387,17 +364,6 @@ namespace PaymentSystemSandbox.Data.Migrations
                     b.Navigation("ToWallet");
                 });
 
-            modelBuilder.Entity("PaymentSystemSandbox.Data.Entities.PaymentTransaction", b =>
-                {
-                    b.HasOne("PaymentSystemSandbox.Data.Entities.Payment", "Payment")
-                        .WithMany("PaymentTransactions")
-                        .HasForeignKey("PaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Payment");
-                });
-
             modelBuilder.Entity("PaymentSystemSandbox.Data.Entities.Wallet", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
@@ -407,11 +373,6 @@ namespace PaymentSystemSandbox.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("PaymentSystemSandbox.Data.Entities.Payment", b =>
-                {
-                    b.Navigation("PaymentTransactions");
                 });
 #pragma warning restore 612, 618
         }

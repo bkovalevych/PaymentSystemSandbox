@@ -19,15 +19,15 @@ namespace PaymentSystemSandbox.Pages.RegularUser
     public class YourPaymentTransactionsModel : PageModel
     {
         private readonly PaymentSystemSandbox.Data.ApplicationDbContext _context;
-        private readonly IUserPaymentTransactionService _transactionService;
+        private readonly IUserPaymentTransactionReportService _transactionService;
 
-        public YourPaymentTransactionsModel(ApplicationDbContext context, IUserPaymentTransactionService transactionService)
+        public YourPaymentTransactionsModel(ApplicationDbContext context, IUserPaymentTransactionReportService transactionService)
         {
             _context = context;
             _transactionService = transactionService;
         }
 
-        public PagingList<PaymentTransaction> PaymentTransaction { get;set; }
+        public PagingList<Payment> PaymentTransaction { get;set; }
 
         public string NextDisabled { get; set; } = "";
         public int NextTopIndex { get; set; } = 0;
@@ -64,7 +64,7 @@ namespace PaymentSystemSandbox.Pages.RegularUser
                 it.Selected = true;
             };
             ViewData["PaymentTypes"] = list; 
-            Expression<Func<PaymentTransaction, bool>> filter = PaymentType switch
+            Expression<Func<Payment, bool>> filter = PaymentType switch
             {
                 "From me" => it => it.FromWallet.UserId == userId,
                 "To me" => it => it.ToWallet.UserId == userId,

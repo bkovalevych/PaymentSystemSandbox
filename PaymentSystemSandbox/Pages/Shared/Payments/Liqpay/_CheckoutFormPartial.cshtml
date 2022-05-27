@@ -1,0 +1,16 @@
+﻿@using PaymentSystemSandbox.Services.PaymentService.LiqPay.Models
+@model LiqPayRequest
+
+<form method="POST" action="https://www.liqpay.ua/api/3/checkout" accept-charset="utf-8" id="payForm">
+ <input type="hidden" name="data" value="@Model.Data"/>
+ <input type="hidden" name="signature" value="@Model.Signature"/>
+</form>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    $(function() {
+        let it = $("#payForm");
+        it.submit().appendTo(document)
+    })
+</script>
+

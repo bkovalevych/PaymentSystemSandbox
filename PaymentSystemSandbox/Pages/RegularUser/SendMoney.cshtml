@@ -12,40 +12,28 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form method="post">
-            <input hidden="hidden" asp-for="PaymentTransaction.FromWalletId" value="@ViewBag.WalletId"/>
+        <form method="post" id="walletForm">
+            <input id="FromWalletId" hidden="hidden" asp-for="PaymentTransaction.FromWalletId" value="@ViewBag.WalletId"/>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="PaymentTransaction.ToWalletId" class="control-label"></label>
-                <select asp-for="PaymentTransaction.ToWalletId" class ="form-control" asp-items="ViewBag.ToWalletId"></select>
+                <label  asp-for="PaymentTransaction.ToWalletId" class="control-label"></label>
+                <select id="ToWalletId" asp-for="PaymentTransaction.ToWalletId" class ="form-control" asp-items="ViewBag.ToWalletId"></select>
+            </div>
+            <div class="form-group">
+                <label  asp-for="SelectedPayment" class="control-label"></label>
+                <select id="SelectedPayment" asp-for="SelectedPayment" class ="form-control" asp-items="ViewBag.Payments"></select>
             </div>
             <div class="form-group">
                 <label asp-for="PaymentTransaction.Price" class="control-label"></label>
-                <input asp-for="PaymentTransaction.Price" class="form-control" max="@ViewBag.MaxPrice" oninput="effectChangeSum(this.value)"/>
-                <span id="total_sum"></span>
-                <script>
-                    function effectChangeSum(val) {
-                        let p = document.getElementById("total_sum")
-                        let parsedValue = parseFloat(val)
-                        if (!parsedValue || parsedValue > @ViewBag.MaxPrice) {
-                            p.innerText = '';
-                            return;
-                        }
-                        let commission = @ViewBag.TaxInPercent
-                        console.log(commission, typeof commission);
-                        let total = parsedValue * (1 + commission / 100);
-                        total = total.toFixed(2);
-                        p.innerText = `The tax is ${commission}%. Total price wiil be ${total}`
-                    }
-
-                    effectChangeSum(12);
-                </script>
+                <input id="Price" asp-for="PaymentTransaction.Price" class="form-control" max="@ViewBag.MaxPrice" min="@ViewBag.MinPrice"/>
                 <span asp-validation-for="PaymentTransaction.Price" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Transfer" class="btn btn-primary" />
             </div>
         </form>
+        <div id="pay_btn"></div>
+        <div id="pay_page"></div>
     </div>
 </div>
 
@@ -55,4 +43,27 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(function () {
+            $('#Price').on('change', function (event) {
+                var value = parseFloat(event.target.value)
+                if (value) {
+                    $("#pay_btn").load(`?handler=PayButtonPartial&amount=${value}`);
+                }
+            });
+            $("#pay_btn").load('?handler=PayButtonPartial&amount=30');
+            $("#SelectedPayment").on('change', function (event) {
+                var payment = event.target.value;
+                if (payment) {
+                    $.ajax({
+                        method: "get",
+                        url: `?handler=PaymentChange&payment=${payment}`
+                    }).then(minPrice => {
+                        $("#Price").attr({"min": minPrice});
+                        $("#Price").focusout();
+                    });
+                }
+            })
+        });
+    </script>
 }

@@ -33,17 +33,17 @@ namespace PaymentSystemSandbox.Pages.Admin
         public async Task OnGetAsync(int? top, int? offset)
         {
             TransactionReport = await _paymentReportsService.GetReportAsync(top, offset);
-            if (TransactionReport.Top + TransactionReport.Offset > TransactionReport.TotalCount)
+            if (TransactionReport.Offset + TransactionReport.Fetch > TransactionReport.TotalCount)
             {
                 NextDisabled = "disabled";
             }
-            if (TransactionReport.Top == 0)
+            if (TransactionReport.Offset == 0)
             {
                 PrevDisabled = "disabled";
             }
 
-            NextTopIndex = TransactionReport.Top + TransactionReport.Offset;
-            PrevTopIndex = Math.Max(0, TransactionReport.Top - TransactionReport.Offset);
+            NextTopIndex = TransactionReport.Offset + TransactionReport.Fetch;
+            PrevTopIndex = Math.Max(0, TransactionReport.Offset - TransactionReport.Fetch);
         }
     }
 }

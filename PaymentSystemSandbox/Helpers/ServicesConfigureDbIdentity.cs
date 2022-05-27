@@ -49,6 +49,8 @@ namespace PaymentSystemSandbox.Helpers
             {
                 throw new Exception($"Admin was not created. {string.Join('\n', result.Errors)}");
             }
+            var token = await userManager.GenerateEmailConfirmationTokenAsync(admin);
+            await userManager.ConfirmEmailAsync(admin, token);
         }
     }
 }
